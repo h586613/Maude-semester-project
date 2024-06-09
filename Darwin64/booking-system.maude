@@ -16,13 +16,11 @@
 
 
 	rl [new-day] :
-	newday(O) 
-	< O : Calendar | date : F >
+	newday(O) < O : Calendar | date : F >
 	=> < O : Calendar | date : F + 1 > .
 
 	rl [makeABooking] :
-	book(C,R,CAL,B) 
-	< C : Customer >
+	book(C,R,CAL,B) < C : Customer >
 	< R : Room >
 	< CAL : Calendar | date : Today >
 	< B : Booking >
