@@ -30,7 +30,7 @@
 	< B : Booking | >
 	=> < B : Booking | dateBooked : Today
  		, startDate : Today + NumDays
- 		, endDate : startDate + bookingLength
+ 		, endDate : 6 + bookingLength
 		, customer : C, room : R > .
 
 
