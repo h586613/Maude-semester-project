@@ -9,8 +9,7 @@
     class Booking | dateBooked : Nat, startDate : Nat, endDate : Nat, customer : Oid, room : Oid .
     class Calendar | date : Nat .
 
-vars NumDays Today F : Nat .
-
+vars NumDays Today F bookingLength : Nat .
 vars C R CAL B : Oid .
 
     rl [new-day] :
