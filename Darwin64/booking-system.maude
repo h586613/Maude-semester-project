@@ -30,7 +30,7 @@
 	< B : Booking | >
 	=> < B : Booking | dateBooked : Today
  		, startDate : Today + NumDays
- 		, endDate : 6 + bookingLength
+ 		, endDate : 6 + bookingLength ***want startDate here, but how to use value that is changed at the same time?
 		, customer : C, room : R > .
 
 
