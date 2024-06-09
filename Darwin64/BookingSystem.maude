@@ -1,0 +1,65 @@
+--- Base types including Oid for object identifiers
+fmod BASE-TYPES is
+    protecting STRING .
+    protecting INT .
+    sort Oid .  --- Declare Oid as a sort
+endfm
+
+--- Enums for statuses
+fmod ENUMS-DATATYPES is
+    sort RoomStatus .
+    ops Available Occupied : -> RoomStatus .
+
+    sort BookingStatus .
+    ops Confirmed InUse Cancelled Archived : -> BookingStatus .
+endfm
+
+--- Date and time functionality
+fmod DATE-TIME is
+    protecting INT .
+    sort DateTime .
+    op dt : Int Int Int Int Int Int -> DateTime [ctor] .
+endfm
+
+--- SET module parameterized by Oid
+fmod SET-OID is
+    protecting BASE-TYPES .
+    protecting SET{Oid} .
+endfm
+
+--- Classes with their attributes
+omod CLASSES is
+    protecting BASE-TYPES .
+    protecting ENUMS-DATATYPES .
+    protecting DATE-TIME .
+    protecting SET-OID .  --- Ensure SET{Oid} is correctly referenced
+    protecting CONFIGURATION .   --- Include the CONFIGURATION module
+
+    class Customer | firstName : String, lastName : String, email : String, phone : String .
+    class Room | roomstatus : RoomStatus, name : String, roomNumber : String, capacity : Int .
+    class Booking | status : BookingStatus, dateBooked : DateTime, startDate : DateTime, endDate : DateTime .
+    class Calendar | bookings : Set{Oid} .
+endom
+
+--- Initial states of objects
+omod INITIAL-STATES is
+    protecting CLASSES .
+
+    op initCustomer : -> Customer .
+    eq initCustomer = < 'customer1 : Customer | firstName : "John", lastName : "Doe", email : "john@example.com", phone : "1234567890" > .
+endom
+
+--- Define operations and transformations
+omod OPERATIONS is
+    protecting INITIAL-STATES .
+
+    *** Define operations like booking a room, etc.
+endom
+
+--- Queries and tests to validate the system behavior
+omod QUERIES-TESTS is
+    protecting OPERATIONS .
+
+    *** Query operations and test cases to check system integrity
+endom
+

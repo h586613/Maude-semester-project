@@ -1,0 +1,27 @@
+omod DATE is
+    protecting NAT .
+    protecting CONFIGURATION .
+
+sort Date .
+
+class Date | month : Nat, day : Nat .
+
+
+***op init-date : -> Oid .
+***rl init-date :
+    ***=>
+    ***<D : Date | month : 1, day : 1> .
+
+***OR
+
+op init-date : -> Oid .
+eq init-date = o(1, Date, (month |-> 1, day |-> 1)) .
+
+op daysToDate : Nat -> Date .
+eq daysToDate(N) = o(1, Date, (month |-> ((N - 1) quo 30 + 1), day |-> ((N - 1) mod 30 + 1))) .
+
+op setDate : Oid Nat -> Oid .
+    rl [setDate] : < O : Date | month : M, day : Da > (N) => < O : Date | month : ((N - 1) quo 30 + 1), day : ((N - 1) mod 30 + 1) > .
+
+
+endom
