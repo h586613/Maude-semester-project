@@ -10,6 +10,11 @@
 	class Booking | dateBooked : Nat, startDate : Nat, endDate : Nat, customer : Oid, room : Oid . ***removed Bools(active, available)
 	class Calendar | date : Nat .
 
+
+	msg newday : Oid -> Msg .
+	msg book : Oid Oid Oid Oid -> Msg .
+
+
 	rl [new-day] :
 	newday(O) 
 	< O : Calendar | date : F >
@@ -29,8 +34,5 @@
 
 	 ***rl [cancelABooking]
 
-	op try : Oid -> Oid .
-
-	eq try : 
 
 endom)
