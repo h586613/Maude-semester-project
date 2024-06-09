@@ -24,7 +24,7 @@
 
 	rl [makeABooking] :
 	book(C, R, CAL, B)
-	< C : Customer >
+	< C : Customer | >
 	< R : Room | >
 	< CAL : Calendar | date : Today >
 	< B : Booking | >
