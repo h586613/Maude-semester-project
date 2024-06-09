@@ -23,11 +23,11 @@
 	=> < O : Calendar | date : F + 1 > .
 
 	rl [makeABooking] :
-	book(C,R,CAL,B)
+	book(C, R, CAL, B)
 	< C : Customer >
-	< R : Room >
+	< R : Room | >
 	< CAL : Calendar | date : Today >
-	< B : Booking >
+	< B : Booking | >
 	=> < B : Booking | dateBooked : Today
  		, startDate : Today + NumDays
  		, endDate : startDate + bookingLength
