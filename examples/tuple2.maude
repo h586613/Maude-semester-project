@@ -1,0 +1,14 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+fmod TUPLE2{X :: TRIV, Y :: TRIV} is
+  sort Tuple{X, Y} .
+  op ((_,_)) : X$Elt Y$Elt -> Tuple{X, Y} [ctor] .
+  op p1_ : Tuple{X, Y} -> X$Elt .
+  op p2_ : Tuple{X, Y} -> Y$Elt .
+  var A : X$Elt .
+  var B : Y$Elt .
+  eq p1 (A, B) = A .
+  eq p2 (A, B) = B .
+endfm

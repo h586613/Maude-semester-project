@@ -1,0 +1,96 @@
+fmod UNIFICATION-EX4 is
+  protecting NAT .
+  sort NList .
+
+  subsort Nat < NList .
+
+  op _:_ : NList NList -> NList [assoc] .
+
+endfm
+
+set verbose on .
+
+  unify X:NList : Y:NList : Z:NList =? P:NList : Q:NList .
+---(
+unify in UNIFICATION-EX4 : X:NList : Y:NList : Z:NList =? P:NList : Q:NList .
+Decision time: 0ms cpu (0ms real)
+
+Unifier 1
+X:NList --> #3:NList : #4:NList
+Y:NList --> #1:NList
+Z:NList --> #2:NList
+P:NList --> #3:NList
+Q:NList --> #4:NList : #1:NList : #2:NList
+
+Unifier 2
+X:NList --> #1:NList
+Y:NList --> #3:NList : #4:NList
+Z:NList --> #2:NList
+P:NList --> #1:NList : #3:NList
+Q:NList --> #4:NList : #2:NList
+
+Unifier 3
+X:NList --> #1:NList
+Y:NList --> #2:NList
+Z:NList --> #4:NList : #3:NList
+P:NList --> #1:NList : #2:NList : #4:NList
+Q:NList --> #3:NList
+
+Unifier 4
+X:NList --> #1:NList
+Y:NList --> #2:NList
+Z:NList --> #3:NList
+P:NList --> #1:NList : #2:NList
+Q:NList --> #3:NList
+
+Unifier 5
+X:NList --> #1:NList
+Y:NList --> #2:NList
+Z:NList --> #3:NList
+P:NList --> #1:NList
+Q:NList --> #2:NList : #3:NList
+)---
+
+*** no unifiers
+unify X:NList : X:NList =? Y:NList : 1 : Y:NList .
+---(
+unify in UNIFICATION-EX4 : X:NList : X:NList =? Y:NList : 1 : Y:NList .
+Associative unification using cycle detection.
+Decision time: 0ms cpu (0ms real)
+No unifier.
+)---
+
+*** 2 unifiers
+unify P:NList : P:NList =? 1 : Q:NList : 2 .
+---(
+unify in UNIFICATION-EX4 : P:NList : P:NList =? 1 : Q:NList : 2 .
+Decision time: 0ms cpu (0ms real)
+
+Unifier 1
+P:NList --> 1 : #1:NList : 2
+Q:NList --> #1:NList : 2 : 1 : #1:NList
+
+Unifier 2
+P:NList --> 1 : 2
+Q:NList --> 2 : 1
+)---
+
+*** no unifiers
+unify 0 : Q:NList =? Q:NList : 0 .
+---(
+unify in UNIFICATION-EX4 : 0 : Q:NList =? Q:NList : 1 .
+Associative unification using cycle detection.
+Decision time: 0ms cpu (0ms real)
+No unifier.
+)---
+
+
+unify in UNIFICATION-EX4 :
+   X:NList : X:NList : X:NList =? Y:NList : Y:NList : Z:NList : Y:NList .
+
+reduce in META-LEVEL :
+           metaUnify(upModule('UNIFICATION-EX4, true),
+             '_:_['0.Nat,'X:NList] =? '_:_['X:NList,'0.Nat], 0, 0) .
+reduce in META-LEVEL :
+           metaUnify(upModule('UNIFICATION-EX4, true),
+             '_:_['0.Nat,'X:NList] =? '_:_['X:NList,'0.Nat], 0, 1) .

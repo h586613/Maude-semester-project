@@ -1,0 +1,8 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload stoset.maude
+
+view STOSET from TRIV to STOSET is
+endv

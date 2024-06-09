@@ -1,0 +1,20 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+omod PERSON is
+  pr NAT .
+  class Person | age : Nat .
+  msg to_: new age_ : Oid Nat -> Msg .
+
+  var A : Nat .
+  var O : Oid .
+
+  rl [change-age] :
+    < O : Person | >
+    to O : new age A
+    => < O : Person | age : A > .
+endom
+
+frew < O:Oid : Person | age : 20 >
+     to O:Oid : new age 21 .

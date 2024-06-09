@@ -1,0 +1,15 @@
+---- from the Maude Manual
+---- by the Maude team
+
+sload process.maude
+sload maybe.maude
+sload view-oid.maude
+
+---- Generic class that works as proxy of an external process
+omod PROCESS-PROXY is
+  inc PROCESS .
+  inc MAYBE{Oid} * ( op maybe{Oid} to null ) .
+
+  class Proxy | state : Nat, process : Maybe{Oid}, io : Maybe{Oid}, err : Maybe{Oid} .
+endom
+

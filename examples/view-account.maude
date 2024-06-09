@@ -1,0 +1,12 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload cell.maude
+sload account.maude
+
+view Account from CELL to ACCOUNT is
+  sort Elt to Int .
+  class Cell to Account .
+  attr contents to bal .
+endv

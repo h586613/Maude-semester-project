@@ -1,0 +1,13 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+fmod PRODUCT is 
+  pr SET{Float} * (op empty to empty [latex (\emptyset)],
+                   op _*_ to _*_ [latex (#1 \cdot #2)]) .
+  op product : Set{Float} -> Float [latex (\prod_{i=\{#1\}}^{}{\bigl( i \bigr)})] .
+  var F : Float .
+  var FS : Set{Float} .
+  eq product((F, FS)) = F * product(FS) .
+  eq product(empty) = 1.0 .
+endfm

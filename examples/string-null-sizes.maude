@@ -1,0 +1,28 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload pfun.maude
+sload view-maybe.maude
+
+fmod NULL-SIZES{X :: TRIV} is
+  pr PFUN{List{Maybe{X}}, Nat} * (op maybe{X} to null) .
+endfm
+
+fmod STRING-NULL-SIZES is
+  pr NULL-SIZES{String} .
+endfm
+
+eof
+
+red in STRING-NULL-SIZES :
+        (< "o" null ; 1 >, < null "o" "t" ; 2 >, < "o" null "t" "t" ; 3 >) ["o" "t"] .
+---(
+result Maybe{Nat}: undefined
+)
+
+red in STRING-NULL-SIZES :
+         (< "o" null ; 1 >, < null "o" "t" ; 2 >, < "o" null "t" "t" ; 3 >) [null "o" "t"] .
+---(
+result NzNat: 2
+)

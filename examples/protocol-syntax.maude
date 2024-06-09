@@ -1,0 +1,47 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+mod PROTOCOL-SYNTAX is
+  sorts Name Nonce Fresh Msg .
+  subsort Name Nonce < Msg .
+
+  ops a b i : -> Name . --- Alice Bob Intruder
+  op n : Name Fresh -> Nonce . --- Nonces
+  ops r1 r2 r3 : -> Fresh .
+  op pk : Name Msg -> Msg . --- Public encryption
+
+  sort SMsg .
+  ops + - : Msg -> SMsg .
+
+  sort SMsgList . subsort SMsg < SMsgList .
+  op nil : -> SMsgList .
+  op _,_ : SMsgList SMsgList -> SMsgList [assoc] .
+
+  sort Strand .
+  op [_|_] : SMsgList SMsgList -> Strand .
+
+  sort StrandSet .
+  subsort Strand < StrandSet .
+  op mt : -> StrandSet .
+  op _&_ : StrandSet StrandSet -> StrandSet [assoc comm id: mt] .
+
+  sort IKnowledge .
+  op mt : -> IKnowledge .
+  op inI : Msg -> IKnowledge . --- Intruder knows
+  op nI : Msg -> IKnowledge . --- Intruder doesn't know
+  op _,_ : IKnowledge IKnowledge -> IKnowledge [assoc comm id: mt] .
+
+  sort State .
+  op {_{_}} : StrandSet IKnowledge -> State .
+
+  var IK : IKnowledge .  var SS : StrandSet .
+  var M : Msg .          vars L1 L2 : SMsgList .
+
+  --- Intruder knows receiving message of a strand
+  rl { (SS & [ ( L1 , -(M)) | L2 ])  { (inI(M) , IK) } } =>
+     { (SS & [ L1 | (-(M) , L2) ])  { (inI(M) , IK) } } [narrowing] .
+  --- Intruder learns a sending message of a strand
+  rl { (SS & [ (L1 , +(M)) | L2 ])  { (inI(M) , IK) } } =>
+     { (SS & [ L1 | (+(M) , L2) ])  { (nI(M) , IK) } } [narrowing] .
+endm

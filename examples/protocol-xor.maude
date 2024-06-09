@@ -1,0 +1,38 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load exclusive-or
+load protocol-syntax
+
+mod PROTOCOL-XOR is
+  extending EXCLUSIVE-OR .
+  extending PROTOCOL-SYNTAX .
+  subsort Nonce < XOR < Msg .
+endm
+
+eof
+
+Maude> vu-narrow
+            {
+              [ nil, -(pk(a, X:Msg)), +(pk(b, n(a, r2))), -(X:Msg * n(a, r2)) | nil] &
+              [ nil, +(pk(a, n(b, r1))), -(pk(b, Y:Msg)), +(Y:Msg * n(b, r1)) | nil]
+              { inI(X:Msg * n(a, r2)), inI(pk(b, Y:Msg)), inI(pk(a, X:Msg)) }
+            }
+        =>* {
+              [ nil | -(pk(a, X:Msg)), +(pk(b, n(a, r2))), -(X:Msg * n(a, r2)), nil] &
+              [ nil | +(pk(a, n(b, r1))), -(pk(b, Y:Msg)), +(Y:Msg * n(b, r1)), nil]
+              { nI(X:Msg * n(a, r2)), nI(pk(b, Y:Msg)), nI(pk(a, X:Msg)) }
+            } .
+
+Maude> vu-narrow {filter,delay}
+            {
+              [ nil, -(pk(a, X:Msg)), +(pk(b, n(a, r2))), -(X:Msg * n(a, r2)) | nil] &
+              [ nil, +(pk(a, n(b, r1))), -(pk(b, Y:Msg)), +(Y:Msg * n(b, r1)) | nil]
+              { inI(X:Msg * n(a, r2)), inI(pk(b, Y:Msg)), inI(pk(a, X:Msg)) }
+            }
+        =>* {
+              [ nil | -(pk(a, X:Msg)), +(pk(b, n(a, r2))), -(X:Msg * n(a, r2)), nil] &
+              [ nil | +(pk(a, n(b, r1))), -(pk(b, Y:Msg)), +(Y:Msg * n(b, r1)), nil]
+              { nI(X:Msg * n(a, r2)), nI(pk(b, Y:Msg)), nI(pk(a, X:Msg)) }
+            } .

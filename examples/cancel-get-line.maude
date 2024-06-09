@@ -1,0 +1,22 @@
+load file
+
+omod CANCEL-GET-LINE is
+  inc STD-STREAM .
+  pr NAT .
+  class MyClass | state : Nat .
+  op myObj : -> Oid .
+  op run : -> Configuration .
+
+  eq run = <> < myObj : MyClass | state : 0 > .
+  rl < myObj : MyClass | state : 0 >
+  => < myObj : MyClass | state : 1 >
+     getLine(stdin, myObj, "What is your name? ") .
+  rl < myObj : MyClass | state : 1 >
+  => < myObj : MyClass | state : 2 >
+     cancelGetLine(stdin, myObj) .
+endom
+
+eof
+
+erew run .
+

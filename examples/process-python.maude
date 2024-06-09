@@ -1,0 +1,57 @@
+---- from the Maude Manual
+---- by the Maude team
+
+sload process-proxy.maude
+
+---- This module provides a function string-extract that extracts a substring
+---- from a given string that matches the given pattern. Specifically, given
+---- a string-extract(X, Y, Str, Pat) message, it returns either
+---- string-extracted(Y, X, Result), with the matched substring, or
+---- string-extract-error(Y, X, Result), if any error happens.
+omod PROCESS-PYTHON is
+  inc PROCESS-PROXY .
+
+  class Python | string : String, pattern : String, requester : Maybe{Oid} .
+  subclass Python < Proxy .
+
+  op string-extract : Oid Oid String String -> Msg .
+  ops string-extracted string-extract-error : Oid Oid String -> Msg .
+
+  vars X Y P ERR IO : Oid .
+  vars Result Str Pat : String .
+
+  rl string-extract(X, Y, Str, Pat)
+  => < X : Python | state : 1, process : null, io : null, err : null,
+                    requester : Y, string : Str, pattern : Pat >
+     createProcess(processManager, X, "python3", "-iu" "string_extract.py", none) .
+  rl < X : Python | state : 1, process : null, io : null, err : null,
+                    string : Str, pattern : Pat >
+     createdProcess(X, processManager, P, IO, ERR)
+  => < X : Python | state : 2, process : P, io : IO, err : ERR >
+     send(IO, X, "select_text('''" + Str + "''', '" + Pat + "')\n")
+     waitForExit(P, X) .
+  rl < X : Python | state : 2, io : IO, err : ERR >
+     sent(X, IO)
+  => < X : Python | state : 3, io : IO, err : ERR >
+     receive(IO, X)
+     receive(ERR, X) .
+  rl < X : Python | state : 3, io : IO, requester : Y > ---- output received
+     received(X, IO, Result)                            ---- Result --> "'104'\n"
+  => < X : Python | state : 4, io : IO, requester : Y >
+     string-extracted(Y, X, substr(Result, 1, sd(length(Result), 3)))
+     send(IO, X, "quit()\n") .
+  rl < X : Python | state : 4, io : IO >                ---- quit sent
+     sent(X, IO)
+  => < X : Python | state : 5, io : IO > .
+  rl < X : Python | err : ERR, requester : Y >          ---- error
+     received(X, ERR, Result)
+  => < X : Python | err : ERR, requester : Y >          ---- error msg might be empty
+     if Result == ">>> " 
+     then none
+     else string-extract-error(Y, X, Result) 
+     fi .
+  rl < X : Python | state : 5, process : P >            ---- process terminated
+     exited(X, P, normalExit(0))
+  => none .
+endom
+

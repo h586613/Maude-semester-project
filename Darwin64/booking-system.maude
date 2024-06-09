@@ -1,24 +1,22 @@
 (omod BOOKING-SYSTEM is
-    protecting STRING .
-    protecting INT .
-    protecting NAT .
+	protecting CONFIGURATION .
+	protecting STRING .
+	protecting INT .
+	protecting NAT .
 
 
-    class Customer | firstName : String, lastName : String, email : String, phone : String .
-    class Room | name : String, roomNumber : String, capacity : Nat .
-    class Booking | dateBooked : Nat, startDate : Nat, endDate : Nat, customer : Oid, room : Oid .
-    class Calendar | date : Nat .
+	class Customer | firstName : String, lastName : String, email : String, phone : String .
+	class Room | name : String, roomNumber : String, capacity : Nat .
+	class Booking | dateBooked : Nat, startDate : Nat, endDate : Nat, customer : Oid, room : Oid . ***removed Bools(active, available)
+	class Calendar | date : Nat .
 
-vars NumDays Today F bookingLength : Nat .
-vars C R CAL B : Oid .
+	rl [new-day] :
+	newday(O) 
+	< O : Calendar | date : F >
+	=> < O : Calendar | date : F + 1 > .
 
-    rl [new-day] :
-    < O : Calendar | date : F >
-    => < O : Calendar | date : F + 1 > .
-
-
-
-    rl [makeABooking] :
+	rl [makeABooking] :
+	book(C,R,CAL,B) 
 	< C : Customer >
 	< R : Room >
 	< CAL : Calendar | date : Today >
@@ -29,9 +27,10 @@ vars C R CAL B : Oid .
 		, customer : C, room : R > .
 
 
-    ***rl [cancelABooking]
+	 ***rl [cancelABooking]
 
-    
+	op try : Oid -> Oid .
+
+	eq try : 
 
 endom)
-

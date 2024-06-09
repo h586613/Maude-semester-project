@@ -1,0 +1,22 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load smt
+
+fmod TEST-RI is
+  protecting REAL-INTEGER .
+  vars W X Y Z : Boolean .
+  vars I J K L : Integer .
+  vars P Q R S : Real .
+endfm
+
+eof
+
+check toInteger(R) + toInteger(P) === toInteger(R + P) .
+
+check not(toInteger(R) + toInteger(P) === toInteger(R + P)) .
+
+check -2 < I and -2 * I > -1 and I =/== -1 .
+
+check -2 < I and -2 * I > -1 and I =/== -1 and I - I =/== I .

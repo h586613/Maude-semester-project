@@ -1,0 +1,17 @@
+fmod UNIFICATION-EX5 is
+  protecting NAT .
+  sort NList .
+  op nil : -> NList .
+  subsort Nat < NList .
+
+  op _:_ : NList NList -> NList [assoc id: nil] .
+
+  *** element variables
+  vars E F G H I J K L M N : Nat .
+
+  *** unconstrained variables
+   vars P Q R S T U V W X Y Z : NList .
+endfm
+
+irredundant unify in UNIFICATION-EX5 :
+X:NList : Y:NList : Z:NList =? P:NList : Q:NList .

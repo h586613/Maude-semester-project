@@ -1,0 +1,96 @@
+---- from the Maude Manual
+---- by the Maude team
+
+---- This program executes the computation in PROCESS-DC and shows its result.
+---- The program shows how we can execute external processes and orchestrate their execution.
+
+---- The program runs an external Maude process in which loads the process-dc.maude file.
+---- On this process, the program uses the dc to do a calculation.
+---- The output is processed in a Python interpreter process using the function select_text.
+---- As result, the string "104" is given.
+
+sload process-python.maude
+
+---- This program uses the above string-extract function to extract the result
+---- from the execution of the process-dc.maude program
+omod PROCESS-MAUDE is
+---- Maude's path, empty string if in the system's path or in the same directory
+  op PATH : -> String .
+  eq PATH = "/Users/duran/Maude/maude-3.4" .
+
+  inc PROCESS-PYTHON .
+
+  msgs result error : String -> Msg .
+
+  op init : -> Configuration .
+  ops me python : -> Oid .
+
+  vars X Y P ERR IO : Oid .
+  vars Result Str Pat : String .
+
+  ---- the program begins by creating the Maude process 
+  rl init
+  => < me : Proxy | state : 1, process : null, io : null, err : null >
+     createProcess(processManager, me, 
+       PATH + "/maude.darwin64", "-trust" "process-dc.maude", none) .
+  ---- Upon creation of the Maude process, it requests its banner 
+  rl < X : Proxy | state : 1, process : null, io : null, err : null >
+     createdProcess(X, processManager, P, IO, ERR)
+  => < X : Proxy | state : 2, process : P, io : IO, err : ERR >
+     receive(IO, X)
+     waitForExit(P, X) .
+  ---- When the banner is received, the command is sent
+  ---- This is the same command used in the previous section
+  rl < X : Proxy | state : 2, io : IO >
+     received(X, IO, Result)             ---- Maude's header
+  => < X : Proxy | state : 3, io : IO >
+     send(IO, X,
+          "erew <> " +
+                "< me : User | state : 1, process : null, " +
+                "              io : null, err : null, result : \"\" > " +
+                "createProcess(processManager, me, \"dc\", nil, none) .\n") .
+  ---- When the sending is confirmed, a request for input is sent
+  rl < X : Proxy | state : 3, io : IO >
+     sent(X, IO)
+  => < X : Proxy | state : 4, io : IO >
+     receive(IO, X) .
+  ---- Maude first sends the command being executed
+  ---- In this case we send a receive message on both channels
+  rl < X : Proxy | state : 4, io : IO, err : ERR >
+     received(X, IO, Result)             ---- command being executed
+  => < X : Proxy | state : 5, io : IO, err : ERR >
+     receive(IO, X)       ---- request output
+     receive(ERR, X) .    ---- and potential error message
+  ---- Once an answer is received, a quit command is sent to the Maude   
+  ---- process to terminate it, and a string-extract message is delivered
+  rl < X : Proxy | state : 5, io : IO >  ---- result from ok execution
+     received(X, IO, Result)
+  => < X : Proxy | state : 6, io : IO >
+     send(IO, X, "q\n")
+     string-extract(python, X, Result, "result : \"([^\"]*)\"") .
+  ---- the response from the string-extract message is handled
+  rl < X : Proxy | state : 6, io : IO >  ---- result from ok execution
+     string-extracted(X, Y, Result)
+  => < X : Proxy | state : 7, io : IO >  ---- result from ok execution
+     result(Result) .
+  rl < X : Proxy | >                     ---- error execution
+     string-extract-error(X, Y, Result)
+  => < X : Proxy | >
+     error(Result) .
+  ---- non-empty error messages are forwarded
+  rl < X : Proxy | err : ERR >           ---- error
+     received(X, ERR, Result)
+  => < X : Proxy | >
+     if Result == "" then none else error(Result) fi . ---- no error message
+  ---- sent and exited messages are consumed
+  rl < X : Proxy | state : 7, io : IO, process : P >
+     sent(X, IO)
+     exited(X, P, normalExit(0))
+  => none .
+endom
+
+eof
+Maude> erew in PROCESS-MAUDE : <>
+                               init .
+rewrites: 32 in 5ms cpu (61ms real) (5457 rewrites/second)
+result Configuration: <> result("104")

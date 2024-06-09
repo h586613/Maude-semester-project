@@ -1,0 +1,9 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload maybe.maude
+
+view Maybe{X :: TRIV} from TRIV to MAYBE{X} is
+  sort Elt to Maybe{X} .
+endv

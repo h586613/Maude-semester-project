@@ -1,0 +1,13 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+fmod EXCLUSIVE-OR is
+  sort XOR .
+  op mt : -> XOR .
+  op _*_ : XOR XOR -> XOR [assoc comm] .
+  vars X Y Z U V : [XOR] .
+  eq [nilp] :     X * X = mt    [variant] .
+  eq [nilp-Coh] : X * X * Z = Z [variant] .
+  eq [id] :       X * mt = X    [variant] .
+endfm

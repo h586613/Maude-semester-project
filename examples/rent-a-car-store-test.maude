@@ -1,0 +1,41 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load rent-a-car-store.maude
+
+mod RENT-A-CAR-STORE-TEST is
+  pr RENT-A-CAR-STORE .
+
+  op StoreConf : -> Configuration [memo] .
+  eq StoreConf
+    = < 'C1 : Customer | cash : 5000, debt : 0, suspended : false >
+      < 'C2 : Customer | cash : 5000, debt : 0, suspended : false >
+      < 'A1 : EconomyCar | available : true, rate : 100 >
+      < 'A3 : MidSizeCar | available : true, rate : 150 >
+      < 'A5 : FullSizeCar | available : true, rate : 200 >
+      < 'C : Calendar | date : 0 > .
+endm
+
+eof
+
+srew StoreConf using car-rental[U:Oid <- 'C1,    ---- size car A3 for 2 days
+                                I:Oid <- 'A3,
+                                NumDays:Int <- 2,
+                                A:Oid <- 'a0] ;
+                     new-day ;
+                     new-day ;
+                     on-date-car-return ;        ---- car A3 is returned
+                     new-day ;
+                     car-rental[U:Oid <- 'C1,    ---- client C1 rents the full
+                                I:Oid <- 'A5,    ---- size car A5 for 1 day
+                                NumDays:Int <- 1,
+                                A:Oid <- 'a1] ;
+                     new-day ;                   ---- two days pass
+                     new-day ;
+                     late-car-return ;           ---- car A5 is returned
+                     new-day ;
+                     suspend-late-payers ;       ---- client C1 is suspended
+                     new-day ;
+                     new-day ;
+                     pay-debt[Amnt:Int <- 100] . ---- client C1 pays 100$

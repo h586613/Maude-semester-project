@@ -1,0 +1,45 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load pfun.maude
+
+fmod SIZES is
+  pr PFUN{List{String}, Nat} .
+endfm
+
+---- red in SIZES :
+----       (< "o" ; 1 >, < "o" "t" ; 2 >, < "o" "t" "t" ; 3 >) ["o" "t"] .
+---- result NzNat: 2
+
+load view-maybe.maude
+
+fmod NULL-SIZES{X :: TRIV} is
+  pr PFUN{List{Maybe{X}}, Nat} * (op maybe{X} to null) .
+endfm
+
+fmod STRING-NULL-SIZES is
+  pr NULL-SIZES{String} .
+endfm
+
+---- red in STRING-NULL-SIZES :
+----   (< "o" null ; 1 >, < null "o" "t" ; 2 >, < "o" null "t" "t" ; 3 >) ["o" "t"] .
+----         (< "o" maybe{String} ; 1 >, < maybe{String} "o" "t" ; 2 >, < "o" maybe{String} "t" "t" ; 3 >) ["o" "t"] .
+---- result Maybe{Nat}: undefined
+
+---- red in STRING-NULL-SIZES :
+----     (< "o" null ; 1 >, < null "o" "t" ; 2 >, < "o" null "t" "t" ; 3 >) [null "o" "t"] .
+----         (< "o" maybe{String} ; 1 >, < maybe{String} "o" "t" ; 2 >, < "o" maybe{String} "t" "t" ; 3 >) [maybe{String} "o" "t"] .
+---- result NzNat: 2
+
+fmod SORTED-SIZES{X :: STRICT-TOTAL-ORDER, Y :: TRIV} is
+  pr PFUN{List{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X}, Y} .
+endfm
+
+fmod NAT-SORTED-SIZES is
+  pr SORTED-SIZES{Nat<, String} .
+endfm
+
+---- red in NAT-SORTED-SIZES :
+----     (< 0 ; "zero" >, < 1 ; "one" >, < 2 ; "two" >) [1] .
+---- result String: "one"

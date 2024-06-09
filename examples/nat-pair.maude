@@ -1,0 +1,21 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+fmod PAIR{X :: TRIV} is
+  pr NAT .
+  sort Pair{X} .
+  op p : X$Elt X$Elt -> Pair{X} [latex ((#1,#2))] .
+  op p : Nat Pair{X} -> X$Elt [latex ({p_{#1}#2})] .
+  vars N1 N2 : X$Elt .
+  eq p(1, p(N1, N2)) = N1 .
+  eq p(2, p(N1, N2)) = N2 .
+endfm
+
+fmod NAT-PAIR is
+  pr PAIR{Nat} .
+endfm
+
+eof
+set trace on .
+red p(1, p(1,2)) .
