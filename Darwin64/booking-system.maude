@@ -12,10 +12,10 @@
 
 
 	msg newday : Oid -> Msg .
-	msg book : Oid Oid Oid Oid -> Msg .
+	msg book : Oid Oid Oid Oid Nat -> Msg .
 
 	vars O C R CAL B : Oid .
-	vars F Today NumDays bookingLength : Nat .
+	vars F Today NumDays bookingLength startd : Nat .
 
 	rl [new-day] :
 	newday(O)
@@ -23,14 +23,14 @@
 	=> < O : Calendar | date : F + 1 > .
 
 	rl [makeABooking] :
-	book(C, R, CAL, B)
+	book(C, R, CAL, B, startd)
 	< C : Customer | >
 	< R : Room | >
 	< CAL : Calendar | date : Today >
 	< B : Booking | >
 	=> < B : Booking | dateBooked : Today
- 		, startDate : Today + NumDays
- 		, endDate : 6 + bookingLength ***want startDate here, but how to use value that is changed at the same time?
+ 		, startDate : startd
+ 		, endDate : startd + bookingLength ***want startDate here, but how to use value that is changed at the same time?
 		, customer : C, room : R > .
 
 
