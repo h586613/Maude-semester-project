@@ -1,0 +1,28 @@
+---- from the Maude Manual
+---- by the Maude team
+
+fmod STRING+ is
+  pr STRING .
+
+  vars Text Text' Pattern New : String .
+  vars PSize TSize : Nat .
+
+  ---- replace(Text, Pattern, New) replaces each occurrences of Pattern in Text with New
+  op replace : String String String -> String .
+  op replace : String String String String Nat Nat -> String .
+  eq replace(Text, Pattern, New)
+    = replace("", Text, Pattern, New, length(Text), length(Pattern)) .
+  eq replace(Text, Text', Pattern, New, TSize, PSize)
+    = if find(Text', Pattern, 0) == notFound
+      then Text + Text'
+      else replace(
+             Text + substr(Text', 0, find(Text', Pattern, 0)) + New,
+             substr(Text', find(Text', Pattern, 0) + PSize, TSize),
+             Pattern, New, TSize, PSize)
+      fi .
+endfm
+
+eof
+
+red replace("0123456789\"104\"0123456789", "\"", "\\\"") .
+

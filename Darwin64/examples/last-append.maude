@@ -1,0 +1,37 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+mod LAST-APPEND is
+  sort Success .
+  op success : -> Success .
+  sort Nat .
+  op 0 : -> Nat .
+  op s : Nat -> Nat .
+  sort NatList .
+  op nil : -> NatList .
+  op _:_ : Nat NatList -> NatList .
+
+  vars XS YS : NatList .
+  vars N M X Y : Nat .
+
+  op append : NatList NatList -> [NatList] .
+  rl append(nil, YS) => YS [narrowing] .
+  rl append(N : XS, YS) => N : append(XS, YS) [narrowing] .
+
+  op last : NatList -> [Nat] .
+  rl last(XS) => append(YS, N : nil) =:= XS >> N [nonexec narrowing] .
+
+  op _>>_ : [Success] [Nat] -> [Nat] [frozen (2) strat (1 0)] .
+  eq success >> X:[Nat] = X:[Nat] .
+
+  op _=:=_ : Nat Nat -> [Success] [comm] .
+  rl N =:= N => success [narrowing] .
+
+  op _=:=_ : NatList NatList -> [Success] [comm] .
+  rl XS =:= XS => success [narrowing] .
+endm
+
+eof
+
+vu-narrow [1] in LAST-APPEND : last(0 : s(0) : nil) =>! Z:Nat .

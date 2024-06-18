@@ -1,0 +1,9 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload tuple2.maude
+
+view Tuple{X :: TRIV, Y :: TRIV} from TRIV to TUPLE2{X, Y} is
+  sort Elt to Tuple{X, Y} .
+endv

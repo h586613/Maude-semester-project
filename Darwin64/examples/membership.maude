@@ -1,0 +1,20 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load last-append
+
+mod MEMBERSHIP is
+  including LAST-APPEND .
+  vars XS YS ZS : NatList .
+  vars N M X Y : Nat .
+  op member : Nat NatList -> [Success] .
+  rl member(N, XS) => append(YS, N : ZS) =:= XS [nonexec narrowing] .
+endm
+
+eof
+
+vu-narrow [1] in MEMBERSHIP :
+         member(s(0), 0 : s(0) : nil) =>! success .
+vu-narrow [,5] in MEMBERSHIP :
+         member(N, 0 : s(0) : nil) =>! success .

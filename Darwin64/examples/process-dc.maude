@@ -1,0 +1,65 @@
+---- from the Maude Manual
+---- by the Maude team
+
+---- The program invokes the dc as an external process to make simple calculations.
+
+load process
+load maybe
+load view-oid
+
+omod PROCESS-DC is
+  inc PROCESS .
+  inc MAYBE{Oid} * (op maybe{Oid} to null) .
+
+  class User | state : Nat, process : Maybe{Oid}, io : Maybe{Oid}, 
+               err : Maybe{Oid}, result : String .
+  op me : -> Oid .
+
+  vars X P ERR IO : Oid .
+  vars Result Str : String .
+
+  rl < X : User | state : 1, process : null, io : null, err : null >
+     createdProcess(X, processManager, P, IO, ERR)
+  => < X : User | state : 2, process : P, io : IO, err : ERR >
+     send(IO, X, "10 16 + p\n")
+     waitForExit(P, X) .
+  rl < X : User | state : 2, io : IO >
+     sent(X, IO)
+  => < X : User | state : 3, io : IO >
+     receive(IO, X) .
+  rl < X : User | state : 3, io : IO, result : "" >
+     received(X, IO, Result)                            ---- Result --> "26\n"
+  => < X : User |
+       state : 4, io : IO, result : substr(Result, 0, sd(length(Result), 1)) >
+     send(IO, X, "4 * p\n") .
+  rl < X : User | state : 4, io : IO >
+     sent(X, IO)
+  => < X : User | state : 5, io : IO >
+     receive(IO, X) .
+  rl < X : User | state : 5, process : P, io : IO, result : Str >
+     received(X, IO, Result)                            ---- Result --> "104\n"
+  => < X : User | state : 6, process : P,
+       io : IO, result : substr(Result, 0, sd(length(Result), 1)) >
+     signalProcess(P, X, "SIGTERM") .
+  rl < X : User | state : 6, process : P >
+     signaledProcess(X, P)
+     exited(X, P, normalExit(0))
+  => < X : User | state : 7, process : P > .
+endom
+
+eof
+Maude> erew <>
+            < me : User | state : 1, 
+                          process : null, 
+                          io : null, 
+                          err : null, 
+                          result : "" >
+            createProcess(processManager, me, "dc", nil, none) .
+rewrites: 12 in 2ms cpu (9ms real) (4175 rewrites/second)
+result Configuration: 
+  <> 
+  < me : User | state : 7, 
+                process : process(33376), 
+                io : socket(3), 
+                err : socket(5), 
+                result : "104" >

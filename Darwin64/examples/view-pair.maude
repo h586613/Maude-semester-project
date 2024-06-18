@@ -1,0 +1,9 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+sload pair.maude
+
+view Pair{X :: TRIV, Y :: TRIV} from TRIV to PAIR{X, Y} is
+  sort Elt to Pair{X, Y} .
+endv

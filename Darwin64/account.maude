@@ -2,11 +2,10 @@
 ---- from the Maude Manual
 ---- by the Maude team
 
-omod ACCOUNT is
+(omod ACCOUNT is
   protecting QID .
   protecting INT .
 
-  subsort Qid < Oid .
   class Account | bal : Int .
   msgs credit debit : Oid Int -> Msg .
   msg from_to_transfer_ : Oid Oid Int -> Msg .
@@ -33,7 +32,7 @@ omod ACCOUNT is
     => < A : Account | bal : N - M >
        < B : Account | bal : N' + M >
     if N >= M .
-endom
+endom)
 
 eof
 

@@ -1,0 +1,14 @@
+fmod GAUSSIAN is
+  pr FLOAT * (op -_ to -_ [latex (-{#1})],
+              op _^_ to _^_ [latex ({#1}^{#2})]) .
+  sort Var Expr .
+  subsort Var Float < Expr .
+  op infinity : -> Float [latex (\infty)].
+  op e : -> Float .
+  op x : -> Var .
+  op gaussian : -> Expr .
+  op integral : Expr Expr Expr Var -> Expr [latex (\int_{#1}^{#2}{#3}\,d{#4})] .
+  op -_ : Expr -> Expr [ditto] .
+  op _^_ : Expr Expr -> Expr [ditto] .
+  eq gaussian = integral(- infinity, infinity, e ^ (- (x ^ 2.0)), x) .
+endfm

@@ -1,0 +1,17 @@
+(omod COUNTER-SYSTEM is
+  protecting NAT .
+
+  class Counter | value : Nat .
+
+  msg inc : Oid -> Msg .
+
+  var O : Oid .
+  var N : Nat .
+
+  rl [increment] :
+  inc(O)
+  < O : Counter | value : N >
+  =>
+  < O : Counter | value : N + 1 > .
+
+endom)

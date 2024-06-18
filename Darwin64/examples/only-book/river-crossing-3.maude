@@ -1,0 +1,442 @@
+---- from the book All About Maude
+---- by the Maude team
+
+mod RIVER-CROSSING-3 is
+  sorts Side Group .
+
+  ops left right : -> Side [ctor] .
+  op change : Side -> Side .
+
+  --- shepherd, wolf, goat, cabbage
+  ops s w g c : Side -> Group [ctor] .
+  op __ : Group Group -> Group [ctor assoc comm] .
+
+  op toBeEaten : Group -> Bool .
+
+  op initial : -> Group .
+
+  vars S S' : Side .
+  var  G : Group .
+
+  eq change(left) = right .
+  eq change(right) = left .
+
+  crl [wolf-eats] : w(S) g(S) s(S') => w(S) s(S') if S =/= S' .
+  crl [goat-eats] : c(S) g(S) w(S') s(S') => g(S) w(S') s(S') if S =/= S' .
+
+  ceq toBeEaten(w(S) g(S) s(S') G) = true if S =/= S' .
+  ceq toBeEaten(c(S) g(S) s(S') G) = true if S =/= S' .
+  eq toBeEaten(G) = false [owise] .
+
+  eq initial = s(left) w(left) g(left) c(left) .
+
+  rl [shepherd-alone] : s(S) => s(change(S)) .
+  rl [wolf] : s(S) w(S) => s(change(S)) w(change(S)) .
+  rl [goat] : s(S) g(S) => s(change(S)) g(change(S)) .
+  rl [cabbage] : s(S) c(S) => s(change(S)) c(change(S)) .
+endm
+
+smod RIVER-CROSSING-STRAT is
+  protecting RIVER-CROSSING-3 .
+
+  strat solution @ Group .
+  sd solution := goat ; shepherd-alone ; wolf ; goat ; cabbage ; shepherd-alone ; goat .
+
+  strats eating oneCrossing playing @ Group .
+  sd eating := wolf-eats | goat-eats .
+  sd oneCrossing := shepherd-alone | wolf | goat | cabbage .
+  sd playing := (eating or-else oneCrossing) * .
+
+  strat safe @ Group .
+  sd safe := (oneCrossing ; not(eating)) * .
+endsm
+
+***(
+Maude> srew initial using solution .
+srewrite in RIVER-CROSSING-STRAT : initial using solution .
+
+Solution 1
+rewrites: 15 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right) c(right)
+
+No more solutions.
+rewrites: 15 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srewrite s(left) w(right) g(right) c(left) using eating or-else oneCrossing .
+srewrite in RIVER-CROSSING-STRAT : s(left) w(right) g(right) c(left) using eating or-else oneCrossing .
+
+Solution 1
+rewrites: 2 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(left) w(right) c(left)
+
+No more solutions.
+rewrites: 2 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srewrite initial using playing .
+srewrite in RIVER-CROSSING-STRAT : initial using playing .
+
+Solution 1
+rewrites: 1 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(left) c(left)
+
+Solution 2
+rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left) c(left)
+
+Solution 3
+rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(left) c(left)
+
+Solution 4
+rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right) c(left)
+
+Solution 5
+rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left) c(right)
+
+Solution 6
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) c(left)
+
+Solution 7
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(left)
+
+Solution 8
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) c(right)
+
+Solution 9
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(right) c(left)
+
+Solution 10
+rewrites: 37 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) c(left)
+
+Solution 11
+rewrites: 37 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(right) g(left)
+
+Solution 12
+rewrites: 37 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(left)
+
+Solution 13
+rewrites: 37 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) c(right)
+
+Solution 14
+rewrites: 38 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right) c(left)
+
+Solution 15
+rewrites: 38 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right) c(right)
+
+Solution 16
+rewrites: 65 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) c(left)
+
+Solution 17
+rewrites: 65 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right)
+
+Solution 18
+rewrites: 71 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) c(right)
+
+Solution 19
+rewrites: 71 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left)
+
+Solution 20
+rewrites: 71 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right)
+
+Solution 21
+rewrites: 72 in 3ms cpu (1ms real) (21785 rewrites/second)
+result Group: s(left) w(left) g(right) c(right)
+
+Solution 22
+rewrites: 72 in 3ms cpu (2ms real) (21785 rewrites/second)
+result Group: s(left) w(left) g(left) c(right)
+
+Solution 23
+rewrites: 74 in 3ms cpu (2ms real) (22390 rewrites/second)
+result Group: s(left) w(right) g(right) c(left)
+
+Solution 24
+rewrites: 74 in 3ms cpu (2ms real) (22390 rewrites/second)
+result Group: s(left) w(right) g(left) c(left)
+
+Solution 25
+rewrites: 99 in 3ms cpu (2ms real) (29954 rewrites/second)
+result Group: s(right) w(left)
+
+Solution 26
+rewrites: 99 in 3ms cpu (2ms real) (29954 rewrites/second)
+result Group: s(left) w(right) c(left)
+
+Solution 27
+rewrites: 105 in 3ms cpu (2ms real) (31770 rewrites/second)
+result Group: s(left) w(left) g(right)
+
+Solution 28
+rewrites: 111 in 3ms cpu (2ms real) (33585 rewrites/second)
+result Group: s(left) w(right) c(right)
+
+Solution 29
+rewrites: 111 in 3ms cpu (2ms real) (33585 rewrites/second)
+result Group: s(left) w(right) g(right)
+
+Solution 30
+rewrites: 113 in 3ms cpu (2ms real) (34190 rewrites/second)
+result Group: s(right) w(right) g(left) c(right)
+
+Solution 31
+rewrites: 125 in 3ms cpu (2ms real) (37821 rewrites/second)
+result Group: s(left) w(right)
+
+Solution 32
+rewrites: 125 in 3ms cpu (3ms real) (37821 rewrites/second)
+result Group: s(left) w(left)
+
+Solution 33
+rewrites: 131 in 3ms cpu (3ms real) (39636 rewrites/second)
+result Group: s(left) w(right) g(left) c(right)
+
+Solution 34
+rewrites: 137 in 3ms cpu (3ms real) (41452 rewrites/second)
+result Group: s(right) w(right)
+
+Solution 35
+rewrites: 141 in 3ms cpu (3ms real) (42662 rewrites/second)
+result Group: s(right) w(right) g(right) c(right)
+
+Solution 36
+rewrites: 155 in 3ms cpu (3ms real) (46898 rewrites/second)
+result Group: s(left) w(right) g(right) c(right)
+
+No more solutions.
+rewrites: 157 in 3ms cpu (3ms real) (47503 rewrites/second)
+
+Maude> srew initial using all * .
+srewrite in RIVER-CROSSING-STRAT : initial using all * .
+
+Solution 1
+rewrites: 1 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(left) c(left)
+
+Solution 2
+rewrites: 5 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(left) c(left)
+
+Solution 3
+rewrites: 8 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right) c(left)
+
+Solution 4
+rewrites: 14 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left) c(right)
+
+Solution 5
+rewrites: 14 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(left)
+
+Solution 6
+rewrites: 19 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left) c(left)
+
+Solution 7
+rewrites: 26 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(left) w(right) g(left) c(left)
+
+Solution 8
+rewrites: 26 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(right) c(left)
+
+Solution 9
+rewrites: 26 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) c(right)
+
+Solution 10
+rewrites: 30 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(left)
+
+Solution 11
+rewrites: 36 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) c(left)
+
+Solution 12
+rewrites: 38 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(right) g(left)
+
+Solution 13
+rewrites: 44 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(left) c(right)
+
+Solution 14
+rewrites: 50 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right) c(left)
+
+Solution 15
+rewrites: 54 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) c(left)
+
+Solution 16
+rewrites: 62 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(left) c(right)
+
+Solution 17
+rewrites: 62 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right) c(right)
+
+Solution 18
+rewrites: 64 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(left) w(left) c(right)
+
+Solution 19
+rewrites: 66 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(right)
+
+Solution 20
+rewrites: 66 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right)
+
+Solution 21
+rewrites: 80 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(right) w(left) g(left)
+
+Solution 22
+rewrites: 88 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(right) w(right) c(left)
+
+Solution 23
+rewrites: 103 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(right) w(right) c(right)
+
+Solution 24
+rewrites: 105 in 0ms cpu (2ms real) (~ rewrites/second)
+result Group: s(left) w(left) g(right)
+
+Solution 25
+rewrites: 107 in 3ms cpu (2ms real) (32103 rewrites/second)
+result Group: s(left) w(right) g(right) c(left)
+
+Solution 26
+rewrites: 111 in 3ms cpu (2ms real) (33303 rewrites/second)
+result Group: s(right) w(left)
+
+Solution 27
+rewrites: 114 in 3ms cpu (2ms real) (34203 rewrites/second)
+result Group: s(left) w(right) g(left) c(right)
+
+Solution 28
+rewrites: 114 in 3ms cpu (2ms real) (34203 rewrites/second)
+result Group: s(left) w(left) g(right) c(right)
+
+Solution 29
+rewrites: 120 in 3ms cpu (3ms real) (36003 rewrites/second)
+result Group: s(left) w(right) g(right)
+
+Solution 30
+rewrites: 125 in 3ms cpu (3ms real) (37503 rewrites/second)
+result Group: s(left) w(right) c(left)
+
+Solution 31
+rewrites: 136 in 3ms cpu (3ms real) (40804 rewrites/second)
+result Group: s(left) w(left)
+
+Solution 32
+rewrites: 138 in 3ms cpu (3ms real) (41404 rewrites/second)
+result Group: s(right) w(right) g(right) c(right)
+
+Solution 33
+rewrites: 142 in 3ms cpu (3ms real) (42604 rewrites/second)
+result Group: s(left) w(right) c(right)
+
+Solution 34
+rewrites: 144 in 3ms cpu (3ms real) (43204 rewrites/second)
+result Group: s(left) w(right)
+
+Solution 35
+rewrites: 154 in 3ms cpu (3ms real) (46204 rewrites/second)
+result Group: s(right) w(right)
+
+Solution 36
+rewrites: 162 in 3ms cpu (3ms real) (48604 rewrites/second)
+result Group: s(left) w(right) g(right) c(right)
+
+No more solutions.
+rewrites: 165 in 3ms cpu (3ms real) (49504 rewrites/second)
+
+Maude> srew initial using playing ; match s(right) w(right) g(right) c(right) .
+srewrite in RIVER-CROSSING-STRAT : initial using playing ; match s(right) w(right) g(right) c(right) .
+
+Solution 1
+rewrites: 145 in 0ms cpu (1ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right) c(right)
+
+No more solutions.
+rewrites: 157 in 0ms cpu (1ms real) (~ rewrites/second)
+
+Maude> search initial =>* s(right) w(right) g(right) c(right) using playing .
+search in RIVER-CROSSING-STRAT : initial =>* s(right) w(right) g(right) c(right) using playing .
+
+Solution 1 (state 35)
+states: 37  rewrites: 159 in 0ms cpu (1ms real) (~ rewrites/second)
+empty substitution
+
+No more solutions.
+states: 37  rewrites: 167 in 0ms cpu (2ms real) (~ rewrites/second)
+
+Maude> show path labels 35 .
+goat
+shepherd-alone
+wolf
+goat
+cabbage
+shepherd-alone
+goat
+
+Maude> search initial =>* s(right) w(right) g(right) c(right) .
+search in RIVER-CROSSING-STRAT : initial =>* s(right) w(right) g(right) c(right) .
+
+Solution 1 (state 30)
+states: 31  rewrites: 119 in 0ms cpu (0ms real) (~ rewrites/second)
+empty substitution
+
+No more solutions.
+states: 36  rewrites: 181 in 0ms cpu (1ms real) (~ rewrites/second)
+
+Maude> show path 30 .
+state 0, Group: s(left) w(left) g(left) c(left)
+===[ rl s(S:Side) w(S:Side) => s(change(S:Side)) w(change(S:Side)) [label wolf] . ]===>
+state 1, Group: s(right) w(right) g(left) c(left)
+===[ rl s(S:Side) => s(change(S:Side)) [label shepherd-alone] . ]===>
+state 6, Group: s(left) w(right) g(left) c(left)
+===[ rl s(S:Side) g(S:Side) => s(change(S:Side)) g(change(S:Side)) [label goat] . ]===>
+state 13, Group: s(right) w(right) g(right) c(left)
+===[ rl s(S:Side) => s(change(S:Side)) [label shepherd-alone] . ]===>
+state 21, Group: s(left) w(right) g(right) c(left)
+===[ rl s(S:Side) c(S:Side) => s(change(S:Side)) c(change(S:Side)) [label cabbage] . ]===>
+state 30, Group: s(right) w(right) g(right) c(right)
+
+Maude> srew initial using safe ; match s(right) w(right) g(right) c(right) .
+srewrite in RIVER-CROSSING-STRAT : initial using safe ; match s(right) w(right) g(right) c(right) .
+
+Solution 1
+rewrites: 69 in 0ms cpu (0ms real) (~ rewrites/second)
+result Group: s(right) w(right) g(right) c(right)
+
+No more solutions.
+rewrites: 79 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> search initial =>* G:Group s.t. toBeEaten(G:Group) using safe .
+search in RIVER-CROSSING-STRAT : initial =>* G:Group such that toBeEaten(G:Group) = true using safe .
+
+No solution.
+states: 17  rewrites: 108 in 0ms cpu (1ms real) (~ rewrites/second)
+)

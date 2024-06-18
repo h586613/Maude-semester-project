@@ -1,0 +1,19 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load saving-account
+
+omod WRONG-CHANGING-SAVING-ACCOUNT is
+  including SAVING-ACCOUNT .
+  var O : Oid .
+  rl < O : Account | > => < O : SavingAccount | > .
+endom
+
+---(
+Advisory: "wrong-changing-saving-account.maude", line 8 (omod WRONG-CHANGING-SAVING-ACCOUNT): class argument SavingAccount in object instance < O : SavingAccount | none > differing from class argument Account in left-hand side object
+    instance < O : Account | none > disables object completion.
+Advisory: "wrong-changing-saving-account.maude", line 8 (omod WRONG-CHANGING-SAVING-ACCOUNT): transformation not performed for:
+  rl < O : Account | none > => < O : SavingAccount | none > .
+
+)

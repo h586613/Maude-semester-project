@@ -1,0 +1,71 @@
+*** Maude demo HVL 
+*** Einar Broch Johnsen, March 2023
+
+
+mod POPULATION is
+    protecting NAT + STRING .
+    protecting CONFIGURATION .
+    sorts Status .
+
+    op single : -> Status [ctor] .
+    ops engaged married : Oid -> Status [ctor] .
+    op age :_ : Nat -> Attribute [ctor].
+    op status :_ : Status -> Attribute [ctor].
+    op Person : -> Cid [ctor] .
+
+    ops marry? yes no : Oid Oid -> Msg .
+    op waitFor : Oid -> Status .
+
+    subsort String < Oid .
+    
+    vars N N' : Nat .   vars X X' Y : String . var S : Status .
+    var AS : AttributeSet . var C : Configuration .
+
+    crl [birthday] :  < X : Person | age : N , status : S >  =>
+                      < X : Person | age : (N + 1), status : S >  if N < 100 .
+
+    crl [wedding] :  < X : Person | status : engaged(X'), age : N >
+                     < X' : Person | status : engaged(X), age : N' >
+                         =>
+                     < X : Person | status : married(X'), age : N >
+                     < X' : Person | status : married(X), age : N' >
+                         if N > 15 and N' > 15 .
+
+    crl [propose] : < X : Person | age : N, status : single >
+                    < Y : Person | age : N', status : single >
+                       =>
+                    < X : Person | age : N, status : waitFor(Y) >
+                    < Y : Person | age : N', status : single >
+                    marry?(X,Y) if N > 15 .
+
+    crl [accept] : marry?(X,Y)
+                   < Y : Person | age : N, status : single >
+                      =>
+                   < Y : Person | age : N, status : engaged(X) > yes(X,Y)
+                   if N > 15 .
+
+    rl [reject] : marry?(X,Y) < Y : Person | age : N, status : S >
+                    => < Y : Person | age : N, status : S > no(X,Y) .
+
+    rl [yes] :
+           yes(X,Y) < X : Person | age : N, status : waitFor(Y) >
+             => < X : Person | age : N, status : engaged(Y) > .
+
+    rl [no] :
+           no(X,Y) < X : Person | age : N, status : waitFor(Y) >
+             => < X : Person | age : N, status : single > .
+
+  op greeks : -> Configuration .
+  eq greeks =   
+    < "Gaia" : Person | age : 999, status : single >
+    < "Uranus" : Person | age : 900, status : single > 
+    < "Kronos" : Person | age : 800, status : single >
+    < "Rhea" : Person | age : 12, status : single > .
+
+    *** Function used for search (*) below
+    op married : Status -> Bool .
+    eq married(married(X)) = true .
+    eq married(S) = false [owise] .
+
+endm
+

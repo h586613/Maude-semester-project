@@ -1,0 +1,20 @@
+fmod IEP-TEST-ITER is
+  protecting INITIAL-EQUALITY-PREDICATE .
+  sort S .
+  ops a b : -> S [ctor] .
+  op f : S S -> S [ctor comm] .
+  op g : S -> S [ctor iter] .
+  op h : S -> S .
+  vars X Y Z : S .
+  eq h(f(X,Y)) = a .
+  eq h(g(X)) = b .
+  eq h(a) = b .
+  eq h(b) = a .
+endfm
+
+eof
+
+Maude> red f(b, g(Z)) .=. f(X, g(Y)) .
+reduce in IEP-TEST : f(b, g(Z)) .=. f(X, g(Y)) .
+rewrites: 8 in 0ms cpu (0ms real) (45197 rewrites/second)
+result Bool: b .=. X and Z .=. Y

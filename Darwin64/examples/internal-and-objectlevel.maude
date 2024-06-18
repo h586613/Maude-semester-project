@@ -1,0 +1,137 @@
+---- from the book All About Maude
+---- by the Maude team
+
+---- from the section "Internal and object-level strategies"
+
+fmod INNER-RIGHTMOST is
+  protecting META-LEVEL .
+
+  *** Try to apply any rule with "label anyRule" in the innermost rightmost
+  *** regex of a term (the type in the triple will be the type of the subterm
+  *** where the rule has been applied)
+  op innerRightmost : Module Term ~> ResultTriple? .
+  op innerRightmost : Module TermList TermList ~> ResultTriple? .
+
+  *** Extend ResultTriple to hold TermLists
+  op {_,_,_} : TermList Type Substitution -> ResultTriple [ctor ditto] .
+
+  *** Relabel all rules of the module to "anyRule"
+  op relabel : Module -> Module .
+
+  var M : Module .
+  var Q : Qid .
+  vars T T' : Term .
+  vars TL TL' : TermList .
+  var Ty : Type .
+  var Sb : Substitution .
+  var RT : ResultTriple .
+  var C : Condition .
+  var Rls : RuleSet .
+  var Attrs : AttrSet .
+
+  ceq innerRightmost(M, Q[TL]) = {Q[TL'], Ty, Sb}
+   if {TL', Ty, Sb} := innerRightmost(M, TL, empty) .
+
+  eq innerRightmost(M, T) = metaApply(M, T, 'anyRule, none, 0) [owise] .
+
+  ceq innerRightmost(M, (TL, T), TL') = {(TL, T', TL'), Ty, Sb}
+   if {T', Ty, Sb} := innerRightmost(M, T) .
+
+  eq innerRightmost(M, (TL, T), TL') = innerRightmost(M, TL, (T, TL')) .
+
+
+  eq relabel(M) = smod getName(M) is
+    getImports(M)
+    sorts getSorts(M) .
+    getSubsorts(M)
+    getOps(M)
+    getMbs(M)
+    getEqs(M)
+    relabel(getRls(M))
+    getStrats(M)
+    getSds(M)
+  endsm .
+
+  op relabel : RuleSet -> RuleSet .
+
+  eq relabel(none) = none .
+  eq relabel(rl T => T' [label(Q) Attrs] . Rls) =
+    (rl T => T' [label('anyRule) Attrs] .) relabel(Rls) .
+  eq relabel(crl T => T' if C [label(Q) Attrs] . Rls) =
+    (crl T => T' if C [label('anyRule) Attrs] .) relabel(Rls) .
+  eq relabel(rl T => T' [Attrs] . Rls) =
+    (rl T => T' [label('anyRule) Attrs] .) relabel(Rls) [owise] .
+  eq relabel(crl T => T' if C [Attrs] . Rls) =
+    (crl T => T' if C [label('anyRule) Attrs] .) relabel(Rls) [owise] .
+endfm
+
+mod LETTER-TREE is
+  sort Letter Tree .
+  subsort Letter < Tree .
+
+  *** Simple module to test the innerRightmost strategy
+
+  ops a b c : -> Letter [ctor] .
+  op {_,_} : Tree Tree -> Tree [ctor] .
+
+  rl [next] : a => b .
+  rl [next] : b => c .
+  rl [swap] : {a, b} => {b, a} .
+  rl [ccaa] : {c, c} => {a, a} .
+endm
+
+mod BEST-SOLUTION is
+  protecting META-LEVEL .
+
+  op bestSolution : Module Term Strategy -> ResultPair? .
+  op bestSolution : Module Term Strategy ResultPair Nat -> ResultPair? .
+
+  var M : Module .
+  vars T T' B : Term .
+  vars Ty Ty' : Type .
+  var S : Strategy .
+  var N : Nat .
+
+  ceq bestSolution(M, T, S) = bestSolution(M, T, S, {T', Ty}, 1)
+   if {T', Ty} := metaSrewrite(M, T, S, breadthFirst, 0) .
+  ceq bestSolution(M, T, S) = failure
+   if metaSrewrite(M, T, S, breadthFirst, 0) == failure .
+  ceq bestSolution(M, T, S, {B, Ty}, N) = bestSolution(M, T, S,
+       if getTerm(metaReduce(M, '_<_[B, T'])) == 'true.Bool
+       then {T', Ty'} else {B, Ty} fi, s N)
+   if {T', Ty'} := metaSrewrite(M, T, S, breadthFirst, N) .
+  ceq bestSolution(M, T, S, {B, Ty}, N)  = {B, Ty}
+   if metaSrewrite(M, T, S, breadthFirst, N) == failure .
+endm
+
+mod NAT-RW is
+  protecting NAT .
+
+  *** Simple module to test the bestSolution strategy
+
+  rl 0 => 1 .
+  rl 0 => 4 .
+  rl 0 => 2 .
+endm
+
+***(
+Maude> red in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter, '`{_`,_`}['a.Letter, 'b.Letter]]) .
+reduce in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter,'`{_`,_`}['a.Letter,'b.Letter]]) .
+rewrites: 23 in 0ms cpu (0ms real) (~ rewrites/second)
+result ResultTriple: {'`{_`,_`}['a.Letter,'`{_`,_`}['a.Letter,'c.Letter]],'Letter,(none).Substitution}
+
+Maude> red in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter, '`{_`,_`}['b.Letter, 'c.Letter]]) .
+reduce in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter,'`{_`,_`}['b.Letter,'c.Letter]]) .
+rewrites: 26 in 0ms cpu (0ms real) (~ rewrites/second)
+result ResultTriple: {'`{_`,_`}['a.Letter,'`{_`,_`}['c.Letter,'c.Letter]],'Letter,(none).Substitution}
+
+Maude> red in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter, '`{_`,_`}['c.Letter, 'c.Letter]]) .
+reduce in INNER-RIGHTMOST : innerRightmost(relabel(upModule('LETTER-TREE, false)), '`{_`,_`}['a.Letter,'`{_`,_`}['c.Letter,'c.Letter]]) .
+rewrites: 28 in 0ms cpu (0ms real) (~ rewrites/second)
+result ResultTriple: {'`{_`,_`}['a.Letter,'`{_`,_`}['a.Letter,'a.Letter]],'Tree,(none).Substitution}
+
+Maude> red in BEST-SOLUTION : bestSolution(['NAT-RW], '0.Zero, all) .
+reduce in BEST-SOLUTION : bestSolution(['NAT-RW], '0.Zero, all) .
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result ResultPair: {'s_^4['0.Zero],'NzNat}
+)

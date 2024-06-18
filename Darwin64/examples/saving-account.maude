@@ -1,0 +1,43 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load account.maude
+
+omod SAVING-ACCOUNT is
+  including ACCOUNT .
+  protecting FLOAT .
+  class SavingAccount | rate : Float .
+  subclass SavingAccount < Account .
+endom
+
+eof
+
+rew < 'A-73728 : SavingAccount | bal : 5000, rate : 3.0 >
+    < 'A-06238 : Account | bal : 2000 >
+    < 'A-28381 : SavingAccount | bal : 9000, rate : 3.0 >
+    debit('A-06238, 1000)
+    credit('A-73728, 1300)
+    credit('A-28381, 200) .
+
+search in SAVING-ACCOUNT :
+    < 'A-73728 : SavingAccount | bal : 5000, rate : 3.0 >
+    < 'A-06238 : Account | bal : 2000 >
+    < 'A-28381 : SavingAccount | bal : 9000, rate : 3.0 >
+    debit('A-06238, 1000)
+    credit('A-73728, 1300)
+    credit('A-28381, 200)
+    =>! C:Configuration
+        < O:Oid : Account | bal : N:Nat >
+    such that N:Nat >= 1000 .
+
+search in SAVING-ACCOUNT :
+    < 'A-73728 : SavingAccount | bal : 5000, rate : 3.0 >
+    < 'A-06238 : Account | bal : 2000 >
+    < 'A-28381 : SavingAccount | bal : 9000, rate : 3.0 >
+    debit('A-06238, 1000)
+    credit('A-73728, 1300)
+    credit('A-28381, 200)
+    =>! C:Configuration
+        < O:Oid : C:Account | bal : N:Nat, Atts:AttributeSet >
+    such that N:Nat >= 1000 .

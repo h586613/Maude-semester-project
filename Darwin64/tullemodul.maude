@@ -1,0 +1,16 @@
+(omod TULLEMODUL is
+	protecting NAT .
+
+class Calendar | date : Nat .
+
+msg newday : Oid -> Msg .
+
+var F : Nat .
+
+
+rl [lol] :
+newday(O) 
+< O : Calendar | date : F >
+=> < O : Calendar | date : F > .
+
+endom)

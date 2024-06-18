@@ -1,0 +1,78 @@
+mod BOOKING-SYSTEM is
+  protecting NAT .
+  protecting STRING .
+  protecting CONFIGURATION .
+
+  sorts User Event BookingStatus .
+
+  *** User attributes
+  op userId : String -> Attribute [ctor] .
+  op userName : String -> Attribute [ctor] .
+  op User : -> Cid [ctor] .
+
+  *** Event attributes
+  op eventId : String -> Attribute [ctor] .
+  op eventName : String -> Attribute [ctor] .
+  op eventCapacity : Nat -> Attribute [ctor] .
+  op bookedUsers : List -> Attribute [ctor] .
+  op Event : -> Cid [ctor] .
+
+  *** Booking status
+  ops booked cancelled : -> BookingStatus [ctor] .
+  op status : BookingStatus -> Attribute [ctor] .
+  op Booking : -> Cid [ctor] .
+
+  subsort String < Oid .
+  subsort String < List .
+
+  vars U E : Oid .
+  var N : Nat .
+  vars UID EID UNAME ENAME : String .
+  var C : Configuration .
+  var L : List .
+
+  *** Rule to create a user
+  op createUser : String String -> Configuration .
+  eq createUser(UID, UNAME) =
+    < UID : User | userId : UID, userName : UNAME > .
+
+  *** Rule to create an event
+  op createEvent : String String Nat -> Configuration .
+  eq createEvent(EID, ENAME, N) =
+    < EID : Event | eventId : EID, eventName : ENAME, eventCapacity : N, bookedUsers : nil > .
+
+  *** Rule to book a user for an event
+  rl [book] :
+    < E : Event | eventCapacity : N, bookedUsers : L > 
+    < U : User | userId : UID, userName : UNAME >
+      =>
+    < E : Event | eventCapacity : N, bookedUsers : (UID L) > 
+    < U : User | userId : UID, userName : UNAME >
+    if size(L) < N .
+
+  *** Rule to cancel a booking
+  crl [cancel] :
+    < E : Event | bookedUsers : L > 
+    < U : User | userId : UID >
+      =>
+    < E : Event | bookedUsers : remove(UID, L) > 
+    < U : User | userId : UID >
+    if member(UID, L) .
+
+  *** Helper functions
+  op size : List -> Nat .
+  eq size(nil) = 0 .
+  eq size(X L) = 1 + size(L) .
+
+  op member : String List -> Bool .
+  eq member(X, nil) = false .
+  eq member(X, X L) = true .
+  eq member(X, Y L) = member(X, L) [owise] .
+
+  op remove : String List -> List .
+  eq remove(X, nil) = nil .
+  eq remove(X, X L) = L .
+  eq remove(X, Y L) = Y remove(X, L) [owise] .
+
+endm
+

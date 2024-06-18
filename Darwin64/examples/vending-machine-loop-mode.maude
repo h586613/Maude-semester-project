@@ -1,0 +1,163 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load vending-machine-grammar.maude
+load buying-strats.maude
+load file.maude
+
+omod VENDING-MACHINE-LOOP-MODE is
+  including LOOP-MODE .
+  including VENDING-MACHINE-GRAMMAR .
+  protecting BUYING-STRATS .
+  protecting CONVERSION .
+  protecting LEXICAL .
+
+  ---- The state of the loop is kept in an object of class VM
+  class VM | action : Action, marking : Marking .
+  subsort Object < State .
+
+  op VM-GRAMMAR : -> Module .
+  eq VM-GRAMMAR = upModule('VENDING-MACHINE-GRAMMAR, false) .
+  op idle : -> Action .
+  op vm : -> Oid .
+  op vending machine : -> System .
+  eq vending machine
+   = [nil, < vm : VM | marking : null, action : idle >, 'Vending 'machine] .
+     
+  var  O : Oid .
+  var  NQIL : NeQidList .
+  var  A : Action .
+  var  I : Item .
+  var  C : Coin .
+  var  M : Marking .
+  var  N : Nat .
+
+  rl [NQIL, < vm : VM | action : idle, marking : M >, nil]
+  => if NQIL == 'quit
+     then [nil, none, 'goodbye]
+     else if metaParse(VM-GRAMMAR, NQIL, 'Action) :: ResultPair
+          then [nil, < vm : VM | 
+                        action : downTerm(
+                                   getTerm(
+                                     metaParse(VM-GRAMMAR, NQIL, 'Action)),
+                                   idle), 
+                        marking : M >, nil]
+          else [NQIL, < vm : VM | action : idle, marking : M >, 'Invalid 'input]
+          fi
+     fi .
+
+  op showBasket : Marking -> QidList .
+  eq showBasket(I M)
+     = metaPrettyPrint(upModule('VENDING-MACHINE-SIGNATURE, false),
+         upTerm(I))
+       showBasket(M) .
+  eq showBasket(C M) = showBasket(M) .
+  eq showBasket(null) = nil .
+
+  op showCredit : Marking -> QidList .
+  eq showCredit(C M)
+     = metaPrettyPrint(upModule('VENDING-MACHINE-SIGNATURE, false),
+         upTerm(C))
+       showCredit(M) .
+  eq showCredit(I M) = showCredit(M) .
+  eq showCredit(null) = nil .
+
+  rl [nil, < vm : VM | action : show basket, marking : M >, nil]
+  => [nil, < vm : VM | action : idle, marking : M >, 'basket: showBasket(M)] .
+
+  rl [nil, < vm : VM | action : show credit, marking : M >, nil]
+  => [nil, < vm : VM | action : idle, marking : M >, 'basket: showCredit(M)] .
+
+  rl [nil, < vm : VM | action : insert q, marking : M >, nil]
+  => [nil, 
+      < vm : VM | action : idle, 
+                  marking : downTerm(insertCoin('add-q, upTerm(M)), null) >, 
+      'one 'quarter 'introduced] .
+
+  rl [nil, < vm : VM | action : insert $, marking : M >, nil]
+  => [nil, 
+      < vm : VM | action : idle, 
+                  marking : downTerm(insertCoin('add-$, upTerm(M)), null) >, 
+      'one 'dollar 'introduced] .
+
+  rl [nil, < vm : VM | action : (buy N c (s)), marking : M >, nil]
+  => [nil, 
+      < vm : VM | action : idle, 
+                  marking : downTerm(onlyNitems(upTerm(M), 'buy-c, N), null) >, 
+      qid(string(N, 10)) 'cakes 'bought] .
+
+  rl [nil, < vm : VM | action : (buy N a (s)), marking : M >, nil]
+  => [nil, 
+      < vm : VM | action : idle, 
+                  marking : downTerm(onlyNitems(upTerm(M), 'buy-a, N), null) >, 
+      qid(string(N, 10)) 'apples 'bought] .
+endom
+
+eof
+
+Maude> loop vending machine .
+Vending machine
+Maude> (insert $)
+one dollar introduced
+Maude> (show credit)
+basket: $
+Maude> (insert $)
+one dollar introduced
+Maude> (insert q)
+one quarter introduced
+Maude> (buy 1 apple(s))
+Invalid input
+Maude> (buy 1 a(s))
+1 apples bought
+Maude> (show basket)
+basket: a
+Maude> (show credit)
+basket: $ q q
+Maude> (insert $)
+one dollar introduced
+Maude> (buy 3 a(s))
+3 apples bought
+Maude> (show basket)
+basket: a a a a
+Maude> (show credit)
+basket: q
+Maude> (quit)
+goodbye
+Maude> 
+
+-----------
+
+Maude> loop vending machine .
+Vending machine
+Maude> cont .
+rewrites: 0 in 0ms cpu (0ms real) (0 rewrites/second)
+result System: [nil, < vm : VM | action : idle, marking : null >, 'Vending 'machine]
+Maude> (insert $)
+one dollar introduced
+Maude> set trace on .
+Maude> (show credit)
+*********** rule
+rl [NQIL, < vm : V:VM | Atts:AttributeSet, action : idle, marking : M >, nil] => if 
+    NQIL == 'quit then [nil, none, 'goodbye] else if metaParse(VM-GRAMMAR, NQIL,
+    'Action) :: ResultPair then [nil, < vm : V:VM | Atts:AttributeSet, action : 
+    downTerm(getTerm(metaParse(VM-GRAMMAR, NQIL, 'Action)), idle), marking : M >, nil] 
+    else [NQIL, < vm : V:VM | Atts:AttributeSet, action : idle, marking : M >, 'Invalid 
+    'input] fi fi .
+NQIL --> 'show 'credit
+V:VM --> VM
+Atts:AttributeSet --> (none).AttributeSet
+M --> $
+['show 'credit, < vm : VM | action : idle, marking : $ >, nil]
+--->
+if 'show 'credit == 'quit then [nil, none, 'goodbye] else if metaParse(VM-GRAMMAR, 
+    'show 'credit, 'Action) :: ResultPair then [nil, < vm : VM | none, action :
+    downTerm(getTerm(metaParse(VM-GRAMMAR, 'show 'credit, 'Action)), idle), marking 
+    : $ >, nil] else ['show 'credit, < vm : VM | none, action : idle, marking : $ >,
+    'Invalid 'input] fi fi
+*********** equation
+...
+basket: $
+Maude> quit
+Bye.
+duran@MacBook-Pro-PD examples % 

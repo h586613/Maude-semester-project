@@ -1,0 +1,71 @@
+fmod IEP-TEST is
+  protecting INITIAL-EQUALITY-PREDICATE .
+  sort S .
+  ops a b : -> S [ctor] .
+  op f : S S -> S [ctor comm] .
+  op g : S -> S [ctor] .
+  op h : S -> S .
+  vars X Y Z : S .
+  eq h(f(X,Y)) = a .
+  eq h(g(X)) = b .
+  eq h(a) = b .
+  eq h(b) = a .
+endfm
+
+eof
+
+Maude> red h(f(X,Y)) .=. h(g(X)) .
+reduce in IEP-TEST : h(g(X)) .=. h(f(X, Y)) .
+rewrites: 3 in 0ms cpu (0ms real) (230769 rewrites/second)
+result Bool: false
+
+Maude> red f(X,Y) .=. f(a,b) .
+reduce in IEP-TEST : f(a, b) .=. f(X, Y) .
+rewrites: 2 in 0ms cpu (0ms real) (68965 rewrites/second)
+result Bool: a .=. X and b .=. Y xor a .=. Y and b .=. X xor a .=. X and a .=. Y and b .=. X and b .=. Y
+
+Maude> red f(X,Y) .=. g(Z) .
+reduce in IEP-TEST : g(Z) .=. f(X, Y) .
+rewrites: 1 in 0ms cpu (0ms real) (1000000 rewrites/second)
+result Bool: false
+
+Maude> red f(X,Y) == f(a,b) .
+reduce in IEP-TEST : f(X, Y) == f(a, b) .
+rewrites: 1 in 0ms cpu (0ms real) (1000000 rewrites/second)
+result Bool: false
+
+Maude> red f(X,Y) == g(Z) .
+reduce in IEP-TEST : f(X, Y) == g(Z) .
+rewrites: 1 in 0ms cpu (0ms real) (1000000 rewrites/second)
+result Bool: false
+
+Maude> red h(f(X,Y)) == h(g(X)) .
+reduce in IEP-TEST : h(f(X, Y)) == h(g(X)) .
+rewrites: 3 in 0ms cpu (0ms real) (3000000 rewrites/second)
+result Bool: false
+
+Maude> red f(X,g(Y)) .=. f(g(Z),b) .
+reduce in IEP-TEST : f(b, g(Z)) .=. f(X, g(Y)) .
+rewrites: 3 in 0ms cpu (0ms real) (3000000 rewrites/second)
+result Bool: b .=. X and Z .=. Y xor b .=. g(Y) and X .=. g(Z) xor b .=. X and b .=. g(Y) and Z .=. Y and X .=. g(Z)
+
+Maude> red h(f(X,Y)) .=. h(h(g(X))) .
+reduce in IEP-TEST : h(h(g(X))) .=. h(f(X, Y)) .
+rewrites: 4 in 0ms cpu (0ms real) (4000000 rewrites/second)
+result Bool: true
+
+Maude> red h(f(X,Y)) == h(h(g(X))) .
+reduce in IEP-TEST : h(f(X, Y)) == h(h(g(X))) .
+rewrites: 4 in 0ms cpu (0ms real) (4000000 rewrites/second)
+result Bool: true
+
+Maude> red g(X) .=. g(h(a)) .
+reduce in IEP-TEST : g(X) .=. g(h(a)) .
+rewrites: 2 in 0ms cpu (0ms real) (2000000 rewrites/second)
+result Bool: b .=. X
+
+Maude> red g(X) == g(h(a)) .
+reduce in IEP-TEST : g(X) == g(h(a)) .
+rewrites: 2 in 0ms cpu (0ms real) (2000000 rewrites/second)
+result Bool: false
+

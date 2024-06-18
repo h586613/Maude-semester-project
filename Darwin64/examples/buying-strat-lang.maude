@@ -1,0 +1,63 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load vending-machine.maude
+
+smod BUYING-STRAT-LANG is
+  protecting VENDING-MACHINE .
+  protecting NAT .
+
+  strat onlyNitems : Item Nat @ Marking .
+  strat oneItem : Item @ Marking .
+
+  var I : Item . var N : Nat .
+
+  sd onlyNitems(I, 0) := idle .
+  sd onlyNitems(I, s N) := (oneItem(I) or-else change) ; onlyNitems(I, N) .
+
+  sd oneItem(c) := buy-c .
+  sd oneItem(a) := buy-a .
+endsm
+
+***(
+Maude> srew in VENDING-MACHINE : $ $ $ q using (buy-c or-else change) ! .
+srewrite in VENDING-MACHINE : $ $ $ q using (buy-c or-else change)! .
+
+Solution 1
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+result Marking: q c c c
+
+No more solutions.
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew in BUYING-STRAT-LANG : $ $ $ q using onlyNitems(a, 3) .
+srewrite in BUYING-STRAT-LANG : $ $ $ q using onlyNitems(a, 3) .
+
+Solution 1
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+result Marking: q q q q a a a
+
+No more solutions.
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew in BUYING-STRAT-LANG : $ $ $ q using (onlyNitems(a, 1) ; onlyNitems(c, 1)) ! .
+srewrite in BUYING-STRAT-LANG : $ $ $ q using (onlyNitems(a, 1) ; onlyNitems(c, 1))! .
+
+Solution 1
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+result Marking: $ q q a c
+
+No more solutions.
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew in VENDING-MACHINE : null using add-q .
+srewrite in VENDING-MACHINE : null using add-q .
+
+Solution 1
+rewrites: 1 in 0ms cpu (0ms real) (~ rewrites/second)
+result Coin: q
+
+No more solutions.
+rewrites: 1 in 0ms cpu (0ms real) (~ rewrites/second)
+)

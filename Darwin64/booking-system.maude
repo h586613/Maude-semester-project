@@ -12,7 +12,7 @@
 
 
 	msg newday : Oid -> Msg .
-	msg book : Oid Oid Oid Oid Nat -> Msg .
+	msg book : Oid Oid Oid Oid Nat Nat -> Msg .
 
 	vars O C R CAL B : Oid .
 	vars F Today NumDays bookingLength startd : Nat .
@@ -23,7 +23,7 @@
 	=> < O : Calendar | date : F + 1 > .
 
 	rl [makeABooking] :
-	book(C, R, CAL, B, startd)
+	book(C, R, CAL, B, startd, bookingLength)
 	< C : Customer | >
 	< R : Room | >
 	< CAL : Calendar | date : Today >

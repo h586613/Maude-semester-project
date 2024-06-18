@@ -1,0 +1,20 @@
+fmod BASIC-ARITHMETIC is
+  -- Define the sort Nat for natural numbers
+  sort Nat .
+
+  -- Define the constructors for natural numbers
+  op 0 : -> Nat [ctor] .
+  op s : Nat -> Nat [ctor] .
+
+  -- Define the addition operation
+  op _+_ : Nat Nat -> Nat .
+
+  -- Variables for equations
+  vars N M : Nat .
+
+  -- Equations for addition
+  eq 0 + N = N .
+  eq s(N) + M = s(N + M) .
+
+endfm
+

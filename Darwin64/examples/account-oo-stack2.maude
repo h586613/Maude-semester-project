@@ -1,0 +1,26 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+load oo-stack2.maude
+load view-account.maude
+
+omod ACCOUNT-OO-STACK2 is
+  inc OO-STACK2{Account}
+                 * (attr first to head,
+                    attr bal to balance,
+                    msg _elt_ to element,
+                    sort Int to Integer) .
+endom
+
+eof
+
+rew < 'stack : Stack{Account} | head : null >
+    < 'A-73728 : Account | balance : 5000 >
+    < 'A-06238 : Account | balance : 2000 >
+    < 'A-28381 : Account | balance : 15000 >
+    ('stack push 'A-73728)
+    ('stack push 'A-06238)
+    ('stack push 'A-28381)
+    ('stack top 'A-06238)
+    ('stack pop) .

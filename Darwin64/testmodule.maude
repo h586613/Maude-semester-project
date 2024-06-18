@@ -1,0 +1,22 @@
+(omod TESTMODULE is
+	protecting INT .
+
+class BankAccount | balance : Int .
+
+***< 'acc1 : BankAccount | balance : 1000 >
+
+op deposit : Oid Int -> Msg .
+op withdraw : Oid Int -> Msg .
+
+rl [deposit] :
+  < O : BankAccount | balance : B > deposit(O, X) =>
+  < O : BankAccount | balance : B + X > .
+
+rl [withdraw] :
+  < O : BankAccount | balance : B > withdraw(O, X) =>
+  < O : BankAccount | balance : B - X > .
+
+***< 'acc1 : BankAccount | balance : 1000 >
+***deposit('acc1, 500) withdraw('acc1, 200)
+
+endom)

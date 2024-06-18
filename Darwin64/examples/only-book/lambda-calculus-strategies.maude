@@ -1,0 +1,114 @@
+---- from the book All About Maude
+---- by the Maude team
+
+sload untyped-lambda-calculus
+
+smod LAMBDA-STRATS{X :: VAR} is
+  protecting BETA-ETA{X} .
+
+  strat applicative @ Lambda{X} .
+
+  vars x z y : X$Var .
+  vars M N : Lambda{X} .
+
+  *** Applicative order (the innermost rightmost redex is reduced first)
+  sd applicative := (matchrew \ x . M by M using applicative)
+		| (matchrew M N by N using applicative)
+		  or-else matchrew M N by M using applicative
+		  or-else top(beta)
+		.
+
+  *** Some alternative strategies to reduce a lambda term
+  strats normal byname byvalue @ Lambda{X} .
+
+  sd normal := (matchrew \ x . M by M using normal)
+             | top(beta)
+               or-else (matchrew M N by M using normal)
+               or-else matchrew M N by N using normal
+             .
+
+  *** Call by name (like normal but without reducing inside abstractions)
+  sd byname := top(beta)
+               or-else (matchrew M N by M using byname)
+               or-else matchrew M N by N using byname .
+
+  *** Call by value (only the outermost redex is reduced and when the right term is simple)
+  sd byvalue := (match (\ x . M) z | match (\ x . M) (\ y . N)) ; top(beta)
+                | (matchrew M N by N using byname)
+                | matchrew M N by M using byname .
+endsm
+
+smod UNTYPED-LAMBDA-STRAT is
+  protecting LAMBDA-STRATS{VarNat} .
+endsm
+
+***(
+Maude> search (\ 0 . 0) ((\ 1 . 1) 2) =>! T:Lambda{VarNat} .
+search in UNTYPED-LAMBDA-STRAT : (\ 0 . 0) ((\ 1 . 1) 2) =>! T:Lambda{VarNat} .
+
+Solution 1 (state 3)
+states: 4  rewrites: 8 in 0ms cpu (0ms real) (~ rewrites/second)
+T:Lambda{VarNat} --> 2
+
+No more solutions.
+states: 4  rewrites: 8 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> show search graph .
+state 0, Lambda{VarNat}: (\ 0 . 0) ((\ 1 . 1) 2)
+arc 0 ===> state 1 (rl ... [label beta] .)
+arc 1 ===> state 2 (rl ... [label beta] .)
+
+state 1, Lambda{VarNat}: (\ 1 . 1) 2
+arc 0 ===> state 3 (rl ... [label beta] .)
+
+state 2, Lambda{VarNat}: (\ 0 . 0) 2
+arc 0 ===> state 3 (rl ... [label beta] .)
+
+state 3, NzNat: 2
+
+Maude> srew (\ 1 . (\ 2 . 2))((\ 1 . (1 1))(\ 1 .(1 1))) using applicative .
+srewrite in UNTYPED-LAMBDA-STRAT : (\ 1 . \ 2 . 2) ((\ 1 . (1 1)) \ 1 . (1 1)) using applicative .
+
+Solution 1
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+result Lambda{VarNat}: (\ 1 . \ 2 . 2) ((\ 1 . (1 1)) \ 1 . (1 1))
+
+No more solutions.
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew (\ 1 . (\ 2 . 2))((\ 1 . (1 1))(\ 1 .(1 1))) using applicative ! .
+srewrite in UNTYPED-LAMBDA-STRAT : (\ 1 . \ 2 . 2) ((\ 1 . (1 1)) \ 1 . (1 1)) using applicative ! .
+
+No solution.
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew (\ 1 . 1) (2 (\ 1 . ((\ 2 . 2) 3))) using applicative !  .
+srewrite in UNTYPED-LAMBDA-STRAT : (\ 1 . 1) (2 \ 1 . ((\ 2 . 2) 3)) using applicative ! .
+
+Solution 1
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+result Lambda{VarNat}: 2 \ 1 . 3
+
+No more solutions.
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew (\ 1 . 1) (2 (\ 1 . ((\ 2 . 2) 3))) using byname !  .
+srewrite in UNTYPED-LAMBDA-STRAT : (\ 1 . 1) (2 \ 1 . ((\ 2 . 2) 3)) using byname ! .
+
+Solution 1
+rewrites: 2 in 0ms cpu (0ms real) (~ rewrites/second)
+result Lambda{VarNat}: 2 \ 1 . ((\ 2 . 2) 3)
+
+No more solutions.
+rewrites: 2 in 0ms cpu (0ms real) (~ rewrites/second)
+
+Maude> srew (\ 1 . 1) (2 (\ 1 . ((\ 2 . 2) 3))) using byvalue !  .
+srewrite in UNTYPED-LAMBDA-STRAT : (\ 1 . 1) (2 \ 1 . ((\ 2 . 2) 3)) using byvalue ! .
+
+Solution 1
+rewrites: 0 in 0ms cpu (0ms real) (~ rewrites/second)
+result Lambda{VarNat}: (\ 1 . 1) (2 \ 1 . ((\ 2 . 2) 3))
+
+No more solutions.
+rewrites: 0 in 0ms cpu (0ms real) (~ rewrites/second)
+)

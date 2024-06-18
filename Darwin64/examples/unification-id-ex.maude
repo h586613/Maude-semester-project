@@ -1,0 +1,120 @@
+---- from the book All About Maude
+---- from the Maude Manual
+---- by the Maude team
+
+mod LEFTID-UNIFICATION-EX is
+  sorts Magma Elem .
+  subsorts Elem < Magma .
+  op __ : Magma Magma -> Magma [gather (E e) left id: e] .
+  ops a b c d e : -> Elem .
+endm
+
+mod RIGHTID-UNIFICATION-EX is
+  sorts Magma Elem .
+  subsorts Elem < Magma .
+  op __ : Magma Magma -> Magma [gather (e E) right id: e] .
+  ops a b c d e : -> Elem .
+endm
+
+mod ID-UNIFICATION-EX is
+  sorts Magma Elem .
+  subsorts Elem < Magma .
+  op __ : Magma Magma -> Magma [gather (E e) id: e] .
+  ops a b c d e : -> Elem .
+endm
+
+mod COMM-ID-UNIFICATION-EX is
+  sorts Magma Elem .
+  subsorts Elem < Magma .
+  op __ : Magma Magma -> Magma [gather (E e) comm id: e] .
+  ops a b c d e : -> Elem .
+endm
+
+***(
+Maude> unify in LEFTID-UNIFICATION-EX : X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> a
+Y:Magma --> e
+
+Unifier 2
+X:Magma --> #1:Magma a
+Y:Magma --> #1:Magma
+
+Maude> irredundant unify in LEFTID-UNIFICATION-EXAMPLE : 
+         X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> #1:Magma a
+Y:Magma --> #1:Magma
+
+Maude> unify in RIGHTID-UNIFICATION-EX : a X:Magma =? a a Y:Magma .
+
+Unifier 1
+X:Magma --> a
+Y:Magma --> e
+
+Unifier 2
+X:Magma --> a #1:Magma
+Y:Magma --> #1:Magma
+
+Maude> irredundant unify in RIGHTID-UNIFICATION-EX : 
+         a X:Magma =? a a Y:Magma .
+
+Unifier 1
+X:Magma --> a #1:Magma
+Y:Magma --> #1:Magma
+
+Maude> unify in ID-UNIFICATION-EX : X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> a
+Y:Magma --> e
+
+Unifier 2
+X:Magma --> #1:Magma a
+Y:Magma --> #1:Magma
+
+Maude> irredundant unify in ID-UNIFICATION-EX : X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> #1:Magma a
+Y:Magma --> #1:Magma
+
+Maude> unify in ID-UNIFICATION-EX : a X:Magma =? a a Y:Magma .
+
+Unifier 1
+X:Magma --> a
+Y:Magma --> e
+
+Maude> unify in COMM-ID-UNIFICATION-EX: X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> a
+Y:Magma --> e
+
+Unifier 2
+X:Magma --> a #1:Magma
+Y:Magma --> #1:Magma
+
+Unifier 3
+X:Magma --> a
+Y:Magma --> e
+
+Maude> irredundant unify in COMM-ID-UNIFICATION-EX : 
+         X:Magma a =? Y:Magma a a .
+
+Unifier 1
+X:Magma --> a #1:Magma
+Y:Magma --> #1:Magma
+
+Maude> unify in COMM-ID-UNIFICATION-EXAMPLE : a X:Magma =? a a Y:Magma .
+
+Unifier 1
+X:Magma --> a a
+Y:Magma --> a
+
+Unifier 2
+X:Magma --> a
+Y:Magma --> e
+)
