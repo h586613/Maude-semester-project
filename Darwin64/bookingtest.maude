@@ -15,9 +15,11 @@ mod BOOKING-SYSTEM is
 
   var N R : String .
   var BS : BookingSystem .
+  var B : Booking .
 
   eq book(N, R, BS) = if not isBooked?(N, R, BS) then BS N @ R else BS fi .
 
-  eq isBooked?(N, R, BS N @ R) = true .
-  eq isBooked?(N, R, BS) = false [owise] .
+  eq isBooked?(N, R, (N @ R) BS) = true .
+  eq isBooked?(N, R, B BS) = isBooked?(N, R, BS) [owise] .
+  eq isBooked?(N, R, null) = false .
 endm
