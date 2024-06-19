@@ -1,6 +1,5 @@
 mod BOOKING-SYSTEM is
   protecting STRING .
-  protecting NAT .
 
   sort Booking .
   sort BookingSystem .
@@ -11,15 +10,14 @@ mod BOOKING-SYSTEM is
   op _@_ : String String -> Booking [ctor] .
 
   op book : String String BookingSystem -> BookingSystem .
-  op isBooked? : String String BookingSystem -> Bool .
+  op cancelBooking : String String BookingSystem -> BookingSystem .
 
   var N R : String .
   var BS : BookingSystem .
   var B : Booking .
 
-  eq book(N, R, BS) = if not isBooked?(N, R, BS) then BS N @ R else BS fi .
+  eq book(N, R, BS) = BS N @ R .
 
-  eq isBooked?(N, R, (N @ R) BS) = true .
-  eq isBooked?(N, R, B BS) = isBooked?(N, R, BS) [owise] .
-  eq isBooked?(N, R, null) = false .
+  eq cancelBooking(N, R, (N @ R) BS) = BS .
+  eq cancelBooking(N, R, B BS) = B cancelBooking(N, R, BS) [owise] .
 endm
